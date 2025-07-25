@@ -6,7 +6,7 @@ import { getConfig } from '../lib/config/environment-config';
 const app = new cdk.App();
 
 // Get environment from context or default to 'dev'
-const environment = app.node.tryGetContext('environment') || 'dev';
+const environment = (app.node.tryGetContext('environment') as string) || 'dev';
 const config = getConfig(environment);
 
 new ServiceStack(app, `${config.envName}-AppStack`, {

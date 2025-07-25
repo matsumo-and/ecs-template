@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+*.js
+*.d.ts
+cdk.out/
+dist/
+build/
+
+# CDK
+cdk.context.json
+
+# Package files
+package-lock.json
+yarn.lock
+
+# Coverage
+coverage/
+.nyc_output/
+
+# IDE
+.vscode/
+.idea/
+
+# Misc
+*.log
+.DS_Store

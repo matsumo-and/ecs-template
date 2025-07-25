@@ -18,9 +18,13 @@ export class EcrRepositoryConstruct extends Construct {
       repositoryName: props.repositoryName,
       imageScanOnPush: props.imageScanOnPush ?? true,
       removalPolicy: RemovalPolicy.DESTROY,
-      lifecycleRules: props.lifecycleMaxImageCount ? [{
-        maxImageCount: props.lifecycleMaxImageCount,
-      }] : undefined,
+      lifecycleRules: props.lifecycleMaxImageCount
+        ? [
+            {
+              maxImageCount: props.lifecycleMaxImageCount,
+            },
+          ]
+        : undefined,
     });
   }
 }

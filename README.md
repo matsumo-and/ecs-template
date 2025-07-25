@@ -45,11 +45,13 @@ cdk-template/
 ## セットアップ
 
 1. 依存関係のインストール:
+
 ```bash
 npm install
 ```
 
 2. TypeScriptのビルド:
+
 ```bash
 npm run build
 ```
@@ -73,12 +75,14 @@ cdk deploy -c environment=prod
 環境別の設定は `lib/config/environment-config.ts` で管理されています。
 
 ### 開発環境 (dev)
+
 - VPC CIDR: 10.0.0.0/16
 - ECS CPU: 256
 - ECS Memory: 512 MB
 - Desired Count: 1
 
 ### 本番環境 (prod)
+
 - VPC CIDR: 10.1.0.0/16
 - ECS CPU: 512
 - ECS Memory: 1024 MB
@@ -89,21 +93,25 @@ cdk deploy -c environment=prod
 デプロイ後、ECRリポジトリにDockerイメージをプッシュする必要があります：
 
 1. ECRにログイン:
+
 ```bash
 aws ecr get-login-password --region <region> | docker login --username AWS --password-stdin <account-id>.dkr.ecr.<region>.amazonaws.com
 ```
 
 2. Dockerイメージをビルド:
+
 ```bash
 docker build -t <repository-name> .
 ```
 
 3. イメージにタグを付ける:
+
 ```bash
 docker tag <repository-name>:latest <account-id>.dkr.ecr.<region>.amazonaws.com/<repository-name>:latest
 ```
 
 4. イメージをプッシュ:
+
 ```bash
 docker push <account-id>.dkr.ecr.<region>.amazonaws.com/<repository-name>:latest
 ```
@@ -113,9 +121,38 @@ docker push <account-id>.dkr.ecr.<region>.amazonaws.com/<repository-name>:latest
 - `npm run build` - TypeScriptをJavaScriptにコンパイル
 - `npm run watch` - ファイルの変更を監視して自動コンパイル
 - `npm run test` - ユニットテストを実行
+- `npm run lint` - ESLintでコードをチェック
+- `npm run lint:fix` - ESLintでコードを自動修正
+- `npm run format` - Prettierでコードをフォーマット
+- `npm run format:check` - フォーマットのチェックのみ実行
 - `cdk diff` - デプロイされたスタックとの差分を表示
 - `cdk synth` - CloudFormationテンプレートを生成
 - `cdk destroy` - スタックを削除
+
+## 開発環境
+
+このプロジェクトは以下の開発ツールが設定されています：
+
+### ESLint & Prettier
+
+- **ESLint**: TypeScriptのコード品質をチェック
+- **Prettier**: コードの自動フォーマット
+- **Format on Save**: VSCodeで保存時に自動フォーマット
+
+### VSCode設定
+
+`.vscode/settings.json`に以下の設定が含まれています：
+
+- 保存時の自動フォーマット
+- ESLintの自動修正
+- 推奨拡張機能の提案
+
+### 推奨VSCode拡張機能
+
+- ESLint
+- Prettier - Code formatter
+- TypeScript compiler
+- AWS Toolkit
 
 ## カスタマイズ
 

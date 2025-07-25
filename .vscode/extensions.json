@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "ms-vscode.vscode-typescript-tsc-compiler",
+    "amazonwebservices.aws-toolkit-vscode"
+  ]
+}
