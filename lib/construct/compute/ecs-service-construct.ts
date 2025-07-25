@@ -5,20 +5,95 @@ import * as ecr from 'aws-cdk-lib/aws-ecr';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { Duration } from 'aws-cdk-lib';
 
+/**
+ * ECS Service Constructのプロパティ
+ */
 export interface EcsServiceConstructProps {
+  /**
+   * ECSクラスター
+   */
   cluster: ecs.ICluster;
+
+  /**
+   * コンテナイメージを取得するECRリポジトリ
+   */
   repository: ecr.IRepository;
+
+  /**
+   * ALBリスナー（ターゲットグループを追加する）
+   */
   listener: elbv2.IApplicationListener;
+
+  /**
+   * ECSサービスの名前
+   */
   serviceName: string;
+
+  /**
+   * タスクのCPU単位（256, 512, 1024, 2048, 4096）
+   * @default 256
+   */
   cpu?: number;
+
+  /**
+   * タスクのメモリ（MB）
+   * @default 512
+   */
   memory?: number;
+
+  /**
+   * 起動するタスクの希望数
+   * @default 1
+   */
   desiredCount?: number;
+
+  /**
+   * ECSタスクに適用するセキュリティグループ
+   * @default - 新しいセキュリティグループが作成される
+   */
   securityGroup?: ec2.ISecurityGroup;
+
+  /**
+   * ALBリスナールールの優先度
+   * @default 100
+   */
   priority?: number;
+
+  /**
+   * パスベースルーティングのパターン
+   * @default - パスベースルーティングなし
+   */
   pathPattern?: string;
 }
 
+/**
+ * ECS Fargateサービスを作成するConstruct
+ *
+ * このConstructは以下を作成します：
+ * - Fargateタスク定義
+ * - ECSサービス
+ * - ALBターゲットグループとリスナールール
+ * - CloudWatch Logsへのログ出力設定
+ *
+ * @example
+ * ```typescript
+ * const ecsService = new EcsServiceConstruct(this, 'EcsService', {
+ *   cluster: cluster,
+ *   repository: repository,
+ *   listener: listener,
+ *   serviceName: 'my-service',
+ *   cpu: 512,
+ *   memory: 1024,
+ *   desiredCount: 2,
+ *   priority: 100,
+ *   pathPattern: '/api/*'
+ * });
+ * ```
+ */
 export class EcsServiceConstruct extends Construct {
+  /**
+   * 作成されたECS Fargateサービス
+   */
   public readonly service: ecs.FargateService;
 
   constructor(scope: Construct, id: string, props: EcsServiceConstructProps) {

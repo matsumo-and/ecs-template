@@ -8,22 +8,90 @@ import { EcsClusterConstruct } from '../construct/compute/ecs-cluster-construct'
 import { EcrRepositoryConstruct } from '../construct/container/ecr-repository-construct';
 import { AlbConstruct } from '../construct/loadbalancer/alb-construct';
 
+/**
+ * SharedResourcesStackのプロパティ
+ */
 export interface SharedResourcesStackProps extends cdk.StackProps {
+  /**
+   * リソースを作成するVPC（BaseInfraStackから参照）
+   */
   vpc: ec2.IVpc;
+
+  /**
+   * ALBに適用するセキュリティグループ（BaseInfraStackから参照）
+   */
   albSecurityGroup: ec2.SecurityGroup;
+
+  /**
+   * ECSクラスターの設定
+   */
   ecsConfig: {
+    /**
+     * ECSクラスターの名前
+     */
     clusterName: string;
   };
+
+  /**
+   * ECRリポジトリの設定
+   */
   ecrConfig: {
+    /**
+     * ECRリポジトリの名前
+     */
     repositoryName: string;
+    /**
+     * ライフサイクルルールで保持する最大イメージ数
+     */
     lifecycleMaxImageCount: number;
   };
 }
 
+/**
+ * 共有リソースを管理するStack
+ *
+ * このStackは複数のサービスで共有されるリソースを作成・管理します：
+ * - ECSクラスター（Fargate）
+ * - ECRリポジトリ
+ * - Application Load Balancer（ALB）
+ *
+ * これらのリソースは個別のサービスStackから参照されることを想定し、
+ * CloudFormation Outputsとしてエクスポートされます。
+ *
+ * @example
+ * ```typescript
+ * const sharedResourcesStack = new SharedResourcesStack(app, 'SharedResourcesStack', {
+ *   vpc: baseInfraStack.vpc,
+ *   albSecurityGroup: baseInfraStack.albSecurityGroup,
+ *   ecsConfig: {
+ *     clusterName: 'my-cluster'
+ *   },
+ *   ecrConfig: {
+ *     repositoryName: 'my-app',
+ *     lifecycleMaxImageCount: 10
+ *   }
+ * });
+ * ```
+ */
 export class SharedResourcesStack extends cdk.Stack {
+  /**
+   * 作成されたECSクラスター
+   */
   public readonly ecsCluster: ecs.ICluster;
+
+  /**
+   * 作成されたECRリポジトリ
+   */
   public readonly ecrRepository: ecr.IRepository;
+
+  /**
+   * 作成されたApplication Load Balancer
+   */
   public readonly alb: elbv2.IApplicationLoadBalancer;
+
+  /**
+   * ALBのHTTPリスナー
+   */
   public readonly listener: elbv2.IApplicationListener;
 
   constructor(scope: Construct, id: string, props: SharedResourcesStackProps) {

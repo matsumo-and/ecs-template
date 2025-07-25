@@ -1,12 +1,43 @@
 import { Construct } from 'constructs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 
+/**
+ * Security Groups Constructのプロパティ
+ */
 export interface SecurityGroupsConstructProps {
+  /**
+   * セキュリティグループを作成するVPC
+   */
   vpc: ec2.IVpc;
 }
 
+/**
+ * ALBとECSタスク用のセキュリティグループを作成するConstruct
+ *
+ * このConstructは以下のセキュリティグループを作成します：
+ * - ALB用セキュリティグループ（HTTP/HTTPSを許可）
+ * - ECSタスク用セキュリティグループ（ALBからのトラフィックを許可）
+ *
+ * @example
+ * ```typescript
+ * const securityGroups = new SecurityGroupsConstruct(this, 'SecurityGroups', {
+ *   vpc: vpc
+ * });
+ * ```
+ */
 export class SecurityGroupsConstruct extends Construct {
+  /**
+   * ALB用のセキュリティグループ
+   * - インバウンド: HTTP(80), HTTPS(443)を全てのIPから許可
+   * - アウトバウンド: 全て許可
+   */
   public readonly albSecurityGroup: ec2.SecurityGroup;
+
+  /**
+   * ECSタスク用のセキュリティグループ
+   * - インバウンド: ALBセキュリティグループからの全トラフィックを許可
+   * - アウトバウンド: 全て許可
+   */
   public readonly ecsSecurityGroup: ec2.SecurityGroup;
 
   constructor(scope: Construct, id: string, props: SecurityGroupsConstructProps) {
