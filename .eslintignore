@@ -2,10 +2,8 @@
 node_modules/
 
 # Build outputs
-*.js
-*.d.ts
-cdk.out/
 dist/
+cdk.out/
 build/
 
 # Test coverage
@@ -18,3 +16,6 @@ coverage/
 
 # Misc
 *.log
+
+# Config files
+jest.config.js

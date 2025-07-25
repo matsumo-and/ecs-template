@@ -2,10 +2,8 @@
 node_modules/
 
 # Build outputs
-*.js
-*.d.ts
-cdk.out/
 dist/
+cdk.out/
 build/
 
 # CDK
