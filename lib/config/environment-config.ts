@@ -8,15 +8,20 @@ export interface EnvironmentConfig {
   };
   ecs: {
     clusterName: string;
-    service: {
-      cpu: number;
-      memory: number;
-      desiredCount: number;
-    };
   };
   ecr: {
     repositoryName: string;
     lifecycleMaxImageCount: number;
+  };
+  services: {
+    [serviceName: string]: {
+      name: string;
+      cpu: number;
+      memory: number;
+      desiredCount: number;
+      priority: number;
+      pathPattern?: string;
+    };
   };
 }
 
@@ -29,15 +34,20 @@ export const environmentConfigs: { [key: string]: EnvironmentConfig } = {
     },
     ecs: {
       clusterName: 'dev-ecs-cluster',
-      service: {
-        cpu: 256,
-        memory: 512,
-        desiredCount: 1,
-      },
     },
     ecr: {
       repositoryName: 'dev-app',
       lifecycleMaxImageCount: 5,
+    },
+    services: {
+      api: {
+        name: 'dev-api-service',
+        cpu: 256,
+        memory: 512,
+        desiredCount: 1,
+        priority: 100,
+        pathPattern: '/api/*',
+      },
     },
   },
   prod: {
@@ -48,15 +58,20 @@ export const environmentConfigs: { [key: string]: EnvironmentConfig } = {
     },
     ecs: {
       clusterName: 'prod-ecs-cluster',
-      service: {
-        cpu: 512,
-        memory: 1024,
-        desiredCount: 2,
-      },
     },
     ecr: {
       repositoryName: 'prod-app',
       lifecycleMaxImageCount: 20,
+    },
+    services: {
+      api: {
+        name: 'prod-api-service',
+        cpu: 512,
+        memory: 1024,
+        desiredCount: 2,
+        priority: 100,
+        pathPattern: '/api/*',
+      },
     },
   },
 };

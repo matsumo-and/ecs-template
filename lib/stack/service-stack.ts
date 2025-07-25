@@ -1,66 +1,58 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { VpcConstruct } from '../construct/network/vpc-construct';
-import { EcsClusterConstruct } from '../construct/compute/ecs-cluster-construct';
-import { EcrRepositoryConstruct } from '../construct/container/ecr-repository-construct';
-import { AlbConstruct } from '../construct/loadbalancer/alb-construct';
+import * as ecs from 'aws-cdk-lib/aws-ecs';
+import * as ecr from 'aws-cdk-lib/aws-ecr';
+import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { EcsServiceConstruct } from '../construct/compute/ecs-service-construct';
-import { EnvironmentConfig } from '../config/environment-config';
 
 export interface ServiceStackProps extends cdk.StackProps {
-  config: EnvironmentConfig;
+  serviceName: string;
+  cluster: ecs.ICluster;
+  repository: ecr.IRepository;
+  listener: elbv2.IApplicationListener;
+  ecsSecurityGroup: ec2.ISecurityGroup;
+  serviceConfig: {
+    cpu: number;
+    memory: number;
+    desiredCount: number;
+  };
+  priority: number;
+  pathPattern?: string;
 }
 
 export class ServiceStack extends cdk.Stack {
+  public readonly service: ecs.FargateService;
+
   constructor(scope: Construct, id: string, props: ServiceStackProps) {
     super(scope, id, props);
 
-    const { config } = props;
-
-    // VPC
-    const vpcConstruct = new VpcConstruct(this, 'VpcConstruct', {
-      cidr: config.vpc.cidr,
-      maxAzs: config.vpc.maxAzs,
-    });
-
-    // ECS Cluster
-    const ecsClusterConstruct = new EcsClusterConstruct(this, 'EcsClusterConstruct', {
-      vpc: vpcConstruct.vpc,
-      clusterName: config.ecs.clusterName,
-    });
-
-    // ECR Repository
-    const ecrRepositoryConstruct = new EcrRepositoryConstruct(this, 'EcrRepositoryConstruct', {
-      repositoryName: config.ecr.repositoryName,
-      lifecycleMaxImageCount: config.ecr.lifecycleMaxImageCount,
-    });
-
-    // ALB
-    const albConstruct = new AlbConstruct(this, 'AlbConstruct', {
-      vpc: vpcConstruct.vpc,
-    });
-
     // ECS Service
-    new EcsServiceConstruct(this, 'EcsServiceConstruct', {
-      cluster: ecsClusterConstruct.cluster,
-      repository: ecrRepositoryConstruct.repository,
-      listener: albConstruct.listener,
-      serviceName: `${config.envName}-app-service`,
-      cpu: config.ecs.service.cpu,
-      memory: config.ecs.service.memory,
-      desiredCount: config.ecs.service.desiredCount,
+    const ecsServiceConstruct = new EcsServiceConstruct(this, 'EcsServiceConstruct', {
+      cluster: props.cluster,
+      repository: props.repository,
+      listener: props.listener,
+      serviceName: props.serviceName,
+      cpu: props.serviceConfig.cpu,
+      memory: props.serviceConfig.memory,
+      desiredCount: props.serviceConfig.desiredCount,
+      securityGroup: props.ecsSecurityGroup,
+      priority: props.priority,
+      pathPattern: props.pathPattern,
     });
 
-    // Output ALB DNS
-    new cdk.CfnOutput(this, 'LoadBalancerDNS', {
-      value: albConstruct.alb.loadBalancerDnsName,
-      description: 'DNS name of the load balancer',
+    this.service = ecsServiceConstruct.service;
+
+    // Output Service Name
+    new cdk.CfnOutput(this, 'ServiceName', {
+      value: this.service.serviceName,
+      description: 'Name of the ECS service',
     });
 
-    // Output ECR Repository URI
-    new cdk.CfnOutput(this, 'ECRRepositoryURI', {
-      value: ecrRepositoryConstruct.repository.repositoryUri,
-      description: 'URI of the ECR repository',
+    // Output Service ARN
+    new cdk.CfnOutput(this, 'ServiceArn', {
+      value: this.service.serviceArn,
+      description: 'ARN of the ECS service',
     });
   }
 }

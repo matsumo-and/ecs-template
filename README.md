@@ -4,13 +4,23 @@
 
 ## アーキテクチャ
 
-このテンプレートは以下のAWSリソースを作成します：
+このテンプレートは複数のStackに分割されており、以下のAWSリソースを作成します：
+
+### BaseInfraStack（基盤インフラ）
 
 - **VPC**: パブリック/プライベートサブネットを持つVPC
+- **Security Groups**: ALBとECSタスク用のセキュリティグループ
+
+### SharedResourcesStack（共有リソース）
+
 - **ECS Cluster**: Fargateを使用したECSクラスター
 - **ECR Repository**: Dockerイメージを保存するためのECRリポジトリ
 - **ALB**: インターネットからのトラフィックを受け付けるApplication Load Balancer
+
+### ServiceStack（サービス）
+
 - **ECS Service**: Fargateで実行されるECSサービス
+- **Target Group**: ALBからのトラフィックをルーティング
 
 ## フォルダ構成
 
@@ -20,10 +30,13 @@ cdk-template/
 │   └── app.ts                    # CDKアプリケーションのエントリーポイント
 ├── lib/
 │   ├── stack/
-│   │   └── service-stack.ts      # メインスタック（各リソースを統合）
+│   │   ├── base-infra-stack.ts   # 基盤インフラStack（VPC、セキュリティグループ）
+│   │   ├── shared-resources-stack.ts  # 共有リソースStack（ECS、ECR、ALB）
+│   │   └── service-stack.ts      # サービスStack（ECSサービス）
 │   ├── construct/
 │   │   ├── network/
-│   │   │   └── vpc-construct.ts  # VPC関連のConstruct
+│   │   │   ├── vpc-construct.ts  # VPC関連のConstruct
+│   │   │   └── security-groups-construct.ts  # セキュリティグループ
 │   │   ├── compute/
 │   │   │   ├── ecs-cluster-construct.ts  # ECSクラスター
 │   │   │   └── ecs-service-construct.ts  # ECSサービス
