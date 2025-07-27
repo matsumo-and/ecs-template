@@ -9,7 +9,12 @@
 ### BaseInfraStack（基盤インフラ）
 
 - **VPC**: パブリック/プライベートサブネットを持つVPC
-- **Security Groups**: ALBとECSタスク用のセキュリティグループ
+- **Security Groups**: ALB、ECSタスク、VPCエンドポイント用のセキュリティグループ
+- **VPC Endpoints**: プライベートサブネットからAWSサービスへのアクセス用
+  - S3 (Gateway Endpoint)
+  - ECR API & ECR DKR (Interface Endpoint)
+  - ECS Agent & ECS Telemetry (Interface Endpoint)
+  - CloudWatch Logs (Interface Endpoint)
 
 ### SharedResourcesStack（共有リソース）
 

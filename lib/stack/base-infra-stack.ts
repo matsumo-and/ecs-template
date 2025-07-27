@@ -3,6 +3,7 @@ import { Construct } from 'constructs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { VpcConstruct } from '../construct/network/vpc-construct';
 import { SecurityGroupsConstruct } from '../construct/network/security-groups-construct';
+import { VpcEndpointsConstruct } from '../construct/network/vpc-endpoints-construct';
 
 /**
  * BaseInfraStackのプロパティ
@@ -28,7 +29,8 @@ export interface BaseInfraStackProps extends cdk.StackProps {
  *
  * このStackは以下のリソースを作成・管理します：
  * - VPC（パブリック/プライベートサブネット、NATゲートウェイ）
- * - セキュリティグループ（ALB用、ECSタスク用）
+ * - セキュリティグループ（ALB用、ECSタスク用、VPCエンドポイント用）
+ * - VPCエンドポイント（S3、ECR、ECS、CloudWatch Logs）
  *
  * 他のStackから参照されることを想定し、主要なリソースは
  * CloudFormation Outputsとしてエクスポートされます。
@@ -75,6 +77,12 @@ export class BaseInfraStack extends cdk.Stack {
     });
     this.albSecurityGroup = securityGroupsConstruct.albSecurityGroup;
     this.ecsSecurityGroup = securityGroupsConstruct.ecsSecurityGroup;
+
+    // VPC Endpoints
+    new VpcEndpointsConstruct(this, 'VpcEndpointsConstruct', {
+      vpc: this.vpc,
+      endpointSecurityGroup: securityGroupsConstruct.endpointSecurityGroup,
+    });
 
     // Outputs for cross-stack references
     new cdk.CfnOutput(this, 'VpcId', {

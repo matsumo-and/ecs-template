@@ -40,6 +40,13 @@ export class SecurityGroupsConstruct extends Construct {
    */
   public readonly ecsSecurityGroup: ec2.SecurityGroup;
 
+  /**
+   * VPCエンドポイント用のセキュリティグループ
+   * - インバウンド: VPC内からのHTTPS(443)を許可
+   * - アウトバウンド: 全て許可
+   */
+  public readonly endpointSecurityGroup: ec2.SecurityGroup;
+
   constructor(scope: Construct, id: string, props: SecurityGroupsConstructProps) {
     super(scope, id);
 
@@ -76,6 +83,20 @@ export class SecurityGroupsConstruct extends Construct {
       this.albSecurityGroup,
       ec2.Port.allTraffic(),
       'Allow traffic from ALB',
+    );
+
+    // VPC Endpoint Security Group
+    this.endpointSecurityGroup = new ec2.SecurityGroup(this, 'EndpointSecurityGroup', {
+      vpc: props.vpc,
+      description: 'Security group for VPC endpoints',
+      allowAllOutbound: true,
+    });
+
+    // Allow HTTPS traffic from VPC CIDR
+    this.endpointSecurityGroup.addIngressRule(
+      ec2.Peer.ipv4(props.vpc.vpcCidrBlock),
+      ec2.Port.tcp(443),
+      'Allow HTTPS from VPC',
     );
   }
 }
