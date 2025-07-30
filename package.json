@@ -11,12 +11,13 @@
     "cdk": "cdk",
     "clean": "rimraf dist",
     "prebuild": "npm run clean",
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{ts,js,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,js,json,md}\""
   },
   "devDependencies": {
+    "@eslint/js": "^9.32.0",
     "@types/jest": "^29.5.14",
     "@types/node": "22.7.9",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
