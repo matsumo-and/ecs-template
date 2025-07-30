@@ -3,6 +3,7 @@ import typescriptPlugin from '@typescript-eslint/eslint-plugin';
 import typescriptParser from '@typescript-eslint/parser';
 import prettierPlugin from 'eslint-plugin-prettier';
 import prettierConfig from 'eslint-config-prettier';
+import customRules from './eslint-rules/index.js';
 
 export default [
   // ESLintの推奨設定
@@ -37,6 +38,7 @@ export default [
     plugins: {
       '@typescript-eslint': typescriptPlugin,
       prettier: prettierPlugin,
+      custom: customRules,
     },
     rules: {
       // TypeScript ESLintの推奨ルール
@@ -58,6 +60,9 @@ export default [
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-non-null-assertion': 'warn',
+
+      // カスタムCDKルール
+      'custom/cdk-stack-termination-protection': 'warn',
     },
   },
 
@@ -81,6 +86,6 @@ export default [
 
   // ignoreパターンの設定
   {
-    ignores: ['*.js', '*.d.ts', 'node_modules/', 'cdk.out/', 'dist/'],
+    ignores: ['*.js', '*.d.ts', 'node_modules/', 'cdk.out/', 'dist/', 'eslint-rules/'],
   },
 ];
